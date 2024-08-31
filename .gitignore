@@ -1,0 +1,17 @@
+# IDE Files
+.idea/
+*.iml
+
+# Miscellaneous
+.DS_Store
+*.class
+*.log
+*.jar
+*.war
+*.ear
+*.o
+*.so
+*.swp
+*.swo
+*.tmp
+*.temp
