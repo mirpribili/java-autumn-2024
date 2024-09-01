@@ -21,6 +21,16 @@ dependencies {
 
     // This dependency is used by the application.
     implementation libs.guava
+
+    // add lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    // add jackson-databind
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    // logger
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'ch.qos.logback:logback-classic:1.2.7'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -32,5 +42,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'org.example.App'
+    mainClass = 'ru.tbank.App'
 }
