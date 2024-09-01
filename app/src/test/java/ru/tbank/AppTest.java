@@ -4,11 +4,18 @@
 package ru.tbank;
 
 import org.junit.Test;
+
+import java.lang.reflect.Method;
+
 import static org.junit.Assert.*;
 
 public class AppTest {
     @Test public void appHasAGreeting() {
-        App classUnderTest = new App();
-        assertNotNull("app should have a greeting", classUnderTest.getGreeting());
-    }
+        Method mainMethod = null;
+        try {
+            mainMethod = Class.forName("ru.tbank.App").getDeclaredMethod("main", String[].class);
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        assertNotNull("App should have a main method", mainMethod);    }
 }
