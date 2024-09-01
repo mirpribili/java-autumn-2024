@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <root level="trace"> <!-- Устанавливаем уровень TRACE, чтобы видеть все логи -->
+    <root level="TRACE">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
