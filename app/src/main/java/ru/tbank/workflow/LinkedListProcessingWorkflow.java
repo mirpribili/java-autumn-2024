@@ -9,9 +9,11 @@ import java.util.stream.Stream;
 public class LinkedListProcessingWorkflow {
     private static final Logger logger = LoggerFactory.getLogger(LinkedListProcessingWorkflow.class);
     private final CustomLinkedList<Integer> customLinkedList;
+    private final CustomLinkedList<Integer> customLinkedList2;
 
     public LinkedListProcessingWorkflow() {
         this.customLinkedList = new CustomLinkedList<>();
+        this.customLinkedList2 = new CustomLinkedList<>();
     }
 
     public void processLinkedList() {
@@ -19,6 +21,8 @@ public class LinkedListProcessingWorkflow {
         customLinkedList.add(1);
         customLinkedList.add(2);
         customLinkedList.add(3);
+        customLinkedList.add(4);
+
 
         // Логика работы с CustomLinkedList
         logger.info("Element at index 1: {}", customLinkedList.get(1));
@@ -26,11 +30,11 @@ public class LinkedListProcessingWorkflow {
         logger.info("List contains 2: {}", customLinkedList.contains(2));
 
         // Преобразование стрима в CustomLinkedList
-        Stream<Integer> stream = Stream.of(4, 5, 6);
-        stream.forEach(customLinkedList::add);
+        Stream<Integer> stream = Stream.of(1, 11, 10);
+        stream.forEach(customLinkedList2::add);
 
         // Использование reduce для суммирования элементов
-        int sum = customLinkedList.stream().reduce(0, Integer::sum);
+        int sum = customLinkedList2.stream().reduce(0, Integer::sum);
         logger.info("Sum of elements: {}", sum);
     }
 }
