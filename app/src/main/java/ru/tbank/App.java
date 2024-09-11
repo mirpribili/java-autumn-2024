@@ -23,6 +23,6 @@ public class App {
         String resourcesPath = "app/src/main/resources/";
         // Обработка городов
         CityProcessingWorkflow cityProcessingWorkflow = new CityProcessingWorkflow(new CityParser());
-        cityProcessingWorkflow.processCityFiles(resourcesPath);
+        //cityProcessingWorkflow.processCityFiles(resourcesPath);
     }
 }
