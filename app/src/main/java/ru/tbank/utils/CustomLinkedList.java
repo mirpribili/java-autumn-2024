@@ -1,15 +1,38 @@
 package ru.tbank.utils;
 
+import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @SuppressWarnings("unchecked")
-public class CustomLinkedList<T> {
+public class CustomLinkedList<T> implements Iterable<T> {
     private Node<T> head;
     private Node<T> tail;
     private transient int size = 0;
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private Node<T> current = head;
+
+            @Override
+            public boolean hasNext() {
+                return current != null;
+            }
+
+            @Override
+            public T next() {
+                if (!hasNext()) {
+                    throw new ElementNotFoundException("Нет больше элементов для возврата.");
+                }
+                T data = current.data;
+                current = current.next;
+                return data;
+            }
+        };
+    }
 
     private static class Node<T> {
         T data;
@@ -83,18 +106,10 @@ public class CustomLinkedList<T> {
         if (list == null) {
             throw new NullPointerException("The specified collection is null");
         }
-        if (list.head != null) {
-            if (head == null) {
-                head = (Node<T>) list.head;
-                tail = (Node<T>) list.tail;
-            } else {
-                Node<? extends T> current = list.head;
-                while (current != null) {
-                    add(current.data);
-                    current = current.next;
-                }
-            }
-            size += list.size;
+
+        // Используем цикл for-each для добавления элементов
+        for (T item : list) {
+            add(item);
         }
     }
 
@@ -125,5 +140,15 @@ public class CustomLinkedList<T> {
         if (index < 0 || index >= size) {
             throw new InvalidIndexException("Ожидается по индексу: " + index + ", Размер: " + size);
         }
+    }
+
+    public static <T> CustomLinkedList<T> fromStream(Stream<T> stream) {
+        return stream.reduce(new CustomLinkedList<T>(), (list, element) -> {
+            list.add(element);
+            return list;
+        }, (list1, list2) -> {
+            list1.addAll(list2);
+            return list1;
+        });
     }
 }
