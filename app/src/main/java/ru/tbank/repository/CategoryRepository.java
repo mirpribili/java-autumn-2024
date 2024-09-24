@@ -4,7 +4,9 @@ import ru.tbank.model.Category;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class CategoryRepository {
     private final ConcurrentHashMap<Integer, Category> categories = new ConcurrentHashMap<>();
     private int currentId = 1;

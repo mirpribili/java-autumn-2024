@@ -26,15 +26,18 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     // add jackson-databind
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
+    //implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     // logger
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
     implementation 'org.slf4j:slf4j-api:1.7.36'
     implementation 'ch.qos.logback:logback-classic:1.2.7'
     // for xmlbind
-    implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    //implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
     // spring web
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
+    // PostConstruct
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    // aspects
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
