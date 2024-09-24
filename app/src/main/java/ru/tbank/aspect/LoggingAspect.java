@@ -14,8 +14,20 @@ public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
     @Around("@annotation(logControllerExecution)")
-    public Object logControllerExecution(ProceedingJoinPoint joinPoint, LogControllerExecution logControllerExecution) throws Throwable {
-        logger.info("Вызов метода: {}", joinPoint.getSignature());
-        return joinPoint.proceed();
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint, LogControllerExecution logControllerExecution) throws Throwable {
+        long start = System.currentTimeMillis();
+
+        // Выполнение метода
+        Object proceed = joinPoint.proceed();
+
+        long executionTime = System.currentTimeMillis() - start;
+
+        // Получение информации о методе и классе
+        String methodName = joinPoint.getSignature().getName();
+        String className = joinPoint.getSignature().getDeclaringTypeName();
+
+        logger.info("Метод {} класса {} выполнен за {} мс", methodName, className, executionTime);
+
+        return proceed;
     }
 }
