@@ -6,27 +6,23 @@ import org.aspectj.lang.annotation.Aspect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.tbank.annotation.LogControllerExecution;
 
 @Aspect
 @Component
 public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Around("execution(* ru.tbank.controller..*(..)) && @annotation(logControllerExecution)")
-    public Object logExecutionTime(ProceedingJoinPoint joinPoint, LogControllerExecution logControllerExecution) throws Throwable {
+    //@Around("(execution(* ru.tbank.controller..*(..)) && @target(ru.tbank.annotation.LogControllerExecution)) || @annotation(ru.tbank.annotation.LogMainExecution)")
+    @Around("execution(* ru.tbank.controller..*(..)) && @target(ru.tbank.annotation.LogControllerExecution) || execution(* ru.tbank.service..*(..)) && @annotation(ru.tbank.annotation.LogMainExecution)")
+    //@Around("(@target(ru.tbank.annotation.LogControllerExecution) || @annotation(ru.tbank.annotation.LogMainExecution))")
+    public Object combinedAdvice(ProceedingJoinPoint joinPoint) throws Throwable {
         long start = System.currentTimeMillis();
+        logger.info("Запуск метода: {}", joinPoint.getSignature().getName());
 
-        // Выполнение метода
         Object proceed = joinPoint.proceed();
 
         long executionTime = System.currentTimeMillis() - start;
-
-        // Получение информации о методе и классе
-        String methodName = joinPoint.getSignature().getName();
-        String className = joinPoint.getSignature().getDeclaringTypeName();
-
-        logger.info("Метод {} класса {} выполнен за {} мс", methodName, className, executionTime);
+        logger.info("Метод {} выполнен за {} мс", joinPoint.getSignature().getName(), executionTime);
 
         return proceed;
     }

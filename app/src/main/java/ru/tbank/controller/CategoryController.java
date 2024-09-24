@@ -1,11 +1,14 @@
 package ru.tbank.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
+import ru.tbank.service.DataInitializer;
 
 import java.util.Collection;
 
@@ -14,6 +17,7 @@ import java.util.Collection;
 @LogControllerExecution
 public class CategoryController {
     private final CategoryRepository repository;
+    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     public CategoryController(CategoryRepository repository) {
         this.repository = repository;
@@ -26,8 +30,10 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
+        logger.info("Получение категории с ID: {}", id);
         Category category = repository.findById(id);
         if (category == null) {
+            logger.error("Ошибка при загрузке данных: {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(category);

@@ -40,6 +40,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.0'
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
+}
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
