@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
 
@@ -21,7 +22,9 @@ public class DataInitializer {
         this.restTemplate = new RestTemplate();
     }
 
+
     @PostConstruct
+    @LogControllerExecution
     public void init() {
         logger.info("Загрузка данных из API kudago начата.");
         try {
