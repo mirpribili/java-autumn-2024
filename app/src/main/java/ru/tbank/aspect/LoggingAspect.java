@@ -13,7 +13,7 @@ import ru.tbank.annotation.LogControllerExecution;
 public class LoggingAspect {
     private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    @Around("@annotation(logControllerExecution)")
+    @Around("execution(* ru.tbank.controller..*(..)) && @target(logControllerExecution)")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint, LogControllerExecution logControllerExecution) throws Throwable {
         long start = System.currentTimeMillis();
 

@@ -3,7 +3,6 @@ package ru.tbank.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-//import ru.tbank.annotation.LogExecutionTime;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
@@ -12,7 +11,7 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/places/categories")
-//@LogExecutionTime
+@LogControllerExecution
 public class CategoryController {
     private final CategoryRepository repository;
 
