@@ -33,12 +33,14 @@ dependencies {
     implementation 'ch.qos.logback:logback-classic:1.2.7'
     // for xmlbind
     implementation 'jakarta.xml.bind:jakarta.xml.bind-api:2.3.3'
+    // spring web
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.2.0'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(11)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
