@@ -16,7 +16,6 @@ import java.util.Collection;
 @LogControllerExecution
 public class LocationController {
     private final LocationRepository repository;
-    private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
 
     public LocationController(LocationRepository repository) {
         this.repository = repository;
@@ -29,10 +28,8 @@ public class LocationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Location> getLocationById(@PathVariable int id) {
-        logger.info("Получение города с ID: {}", id);
         Location location = repository.findById(id);
         if (location == null) {
-            logger.error("Город с ID {} не найден", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(location);

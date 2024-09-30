@@ -11,7 +11,6 @@ import ru.tbank.service.DataInitializer;
 
 @Repository
 public class CategoryRepository {
-    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
     private final ConcurrentHashMap<Integer, Category> categories = new ConcurrentHashMap<>();
     private int currentId = 0;
 
@@ -25,7 +24,6 @@ public class CategoryRepository {
 
     public Category save(Category category) {
         category.setId(currentId++);
-        logger.debug("Сохранена категория: {} с id {}", category, currentId);
         categories.put(category.getId(), category);
         return category;
     }

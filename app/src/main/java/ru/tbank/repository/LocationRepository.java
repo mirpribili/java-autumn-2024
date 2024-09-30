@@ -10,7 +10,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class LocationRepository {
-    private static final Logger logger = LoggerFactory.getLogger(LocationRepository.class);
 
     private final ConcurrentHashMap<Integer, Location> locations = new ConcurrentHashMap<>();
     private int currentId = 0;
@@ -25,7 +24,6 @@ public class LocationRepository {
 
     public Location save(Location location) {
         location.setId(currentId++);
-        logger.debug("Сохранен город: {} с id {}", location, currentId);
         locations.put(location.getId(), location);
         return location;
     }

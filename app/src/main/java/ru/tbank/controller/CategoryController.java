@@ -17,7 +17,6 @@ import java.util.Collection;
 @LogControllerExecution
 public class CategoryController {
     private final CategoryRepository repository;
-    private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
 
     public CategoryController(CategoryRepository repository) {
         this.repository = repository;
@@ -30,16 +29,13 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
-        logger.info("Получение категории с ID: {}", id);
         Category category = repository.findById(id);
         if (category == null) {
-            logger.error("Ошибка при загрузке данных: {}", id);
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(category);
     }
 
-    //@LogExecutionTime
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
         Category createdCategory = repository.save(category);
