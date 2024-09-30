@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Location;
-import ru.tbank.repository.LocationRepository;
+import ru.tbank.service.LocationService;
 
 import java.util.Collection;
 
@@ -13,44 +13,38 @@ import java.util.Collection;
 @RequestMapping("/api/v1/locations")
 @LogControllerExecution
 public class LocationController {
-    private final LocationRepository repository;
+    private final LocationService locationService;
 
-    public LocationController(LocationRepository repository) {
-        this.repository = repository;
+    public LocationController(LocationService locationService) {
+        this.locationService = locationService;
     }
 
     @GetMapping
     public Collection<Location> getAllLocations() {
-        return repository.findAll();
+        return locationService.getAllLocations();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Location> getLocationById(@PathVariable int id) {
-        Location location = repository.findById(id);
-        if (location == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Location location = locationService.getLocationById(id);
         return ResponseEntity.ok(location);
     }
 
     @PostMapping
     public ResponseEntity<Location> createLocation(@RequestBody Location location) {
-        Location createdLocation = repository.save(location);
+        Location createdLocation = locationService.createLocation(location);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdLocation);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Location> updateLocation(@PathVariable int id, @RequestBody Location location) {
-        Location updatedLocation = repository.update(id, location);
-        if (updatedLocation == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Location updatedLocation = locationService.updateLocation(id, location);
         return ResponseEntity.ok(updatedLocation);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable int id) {
-        repository.delete(id);
+        locationService.deleteLocation(id);
         return ResponseEntity.noContent().build();
     }
 }

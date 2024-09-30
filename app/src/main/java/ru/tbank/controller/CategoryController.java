@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
-import ru.tbank.repository.CategoryRepository;
 import ru.tbank.service.CategoryService;
 
 import java.util.Collection;
@@ -14,16 +13,15 @@ import java.util.Collection;
 @RequestMapping("/api/v1/places/categories")
 @LogControllerExecution
 public class CategoryController {
-    private final CategoryRepository repository;
     private final CategoryService categoryService;
 
-    public CategoryController(CategoryRepository repository, CategoryService categoryService) {
-        this.repository = repository;
+    public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }
+
     @GetMapping
     public Collection<Category> getAllCategories() {
-        return repository.findAll();
+        return categoryService.getAllCategories();
     }
 
     @GetMapping("/{id}")
@@ -34,22 +32,19 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<Category> createCategory(@RequestBody Category category) {
-        Category createdCategory = repository.save(category);
+        Category createdCategory = categoryService.createCategory(category);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable int id, @RequestBody Category category) {
-        Category updatedCategory = repository.update(id, category);
-        if (updatedCategory == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Category updatedCategory = categoryService.updateCategory(id, category);
         return ResponseEntity.ok(updatedCategory);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable int id) {
-        repository.delete(id);
+        categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
 }

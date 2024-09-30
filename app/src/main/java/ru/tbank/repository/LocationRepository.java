@@ -1,11 +1,10 @@
 package ru.tbank.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.tbank.model.Location;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
@@ -18,8 +17,8 @@ public class LocationRepository {
         return locations.values();
     }
 
-    public Location findById(int id) {
-        return locations.get(id);
+    public Optional<Location> findById(int id) {
+        return Optional.ofNullable(locations.get(id));
     }
 
     public Location save(Location location) {
@@ -35,5 +34,9 @@ public class LocationRepository {
 
     public void delete(int id) {
         locations.remove(id);
+    }
+
+    public boolean existsById(int id) {
+        return locations.containsKey(id);
     }
 }

@@ -6,6 +6,7 @@ import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class CategoryService {
@@ -20,10 +21,8 @@ public class CategoryService {
     }
 
     public Category getCategoryById(int id) {
-        if (!repository.existsById(id)) {
-            throw new CategoryNotFoundException(id);
-        }
-        return repository.findById(id);
+        return Optional.ofNullable(repository.findById(id))
+                .orElseThrow(() -> new CategoryNotFoundException(id));
     }
 
     public Category createCategory(Category category) {
@@ -31,16 +30,11 @@ public class CategoryService {
     }
 
     public Category updateCategory(int id, Category category) {
-        if (!repository.existsById(id)) {
-            throw new CategoryNotFoundException(id);
-        }
-        return repository.update(id, category);
+        return Optional.ofNullable(repository.update(id, category))
+                .orElseThrow(() -> new CategoryNotFoundException(id));
     }
 
     public void deleteCategory(int id) {
-        if (!repository.existsById(id)) {
-            throw new CategoryNotFoundException(id);
-        }
         repository.delete(id);
     }
 }
