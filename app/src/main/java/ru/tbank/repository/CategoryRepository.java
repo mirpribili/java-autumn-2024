@@ -1,14 +1,13 @@
 package ru.tbank.repository;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import ru.tbank.exception.CategoryNotFoundException;
 import ru.tbank.model.Category;
 
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Repository;
-import ru.tbank.service.DataInitializer;
-
+@Slf4j
 @Repository
 public class CategoryRepository {
     private final ConcurrentHashMap<Integer, Category> categories = new ConcurrentHashMap<>();
@@ -29,11 +28,23 @@ public class CategoryRepository {
     }
 
     public Category update(int id, Category category) {
+        if (!categories.containsKey(id)) {
+            log.warn("Попытка обновления несуществующей категории с ID: {}", id);
+            throw new CategoryNotFoundException(id); // Выбрасываем исключение
+        }
         category.setId(id);
         return categories.replace(id, category);
     }
 
     public void delete(int id) {
+        if (!categories.containsKey(id)) {
+            log.warn("Попытка удаления несуществующей категории с ID: {}", id);
+            throw new CategoryNotFoundException(id); // Выбрасываем исключение
+        }
         categories.remove(id);
+    }
+
+    public boolean existsById(int id) {
+        return categories.containsKey(id);
     }
 }

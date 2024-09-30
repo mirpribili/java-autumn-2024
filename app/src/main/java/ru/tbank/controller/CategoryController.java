@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
+import ru.tbank.service.CategoryService;
 
 import java.util.Collection;
 
@@ -14,9 +15,11 @@ import java.util.Collection;
 @LogControllerExecution
 public class CategoryController {
     private final CategoryRepository repository;
+    private final CategoryService categoryService;
 
-    public CategoryController(CategoryRepository repository) {
+    public CategoryController(CategoryRepository repository, CategoryService categoryService) {
         this.repository = repository;
+        this.categoryService = categoryService;
     }
     @GetMapping
     public Collection<Category> getAllCategories() {
@@ -25,10 +28,7 @@ public class CategoryController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable int id) {
-        Category category = repository.findById(id);
-        if (category == null) {
-            return ResponseEntity.notFound().build();
-        }
+        Category category = categoryService.getCategoryById(id);
         return ResponseEntity.ok(category);
     }
 
