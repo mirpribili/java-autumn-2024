@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class CategoryRepository {
     private final ConcurrentHashMap<Integer, Category> categories = new ConcurrentHashMap<>();
-    private int currentId = 0;
+    private Integer currentId = 0;
 
     public Collection<Category> findAll() {
         return categories.values();

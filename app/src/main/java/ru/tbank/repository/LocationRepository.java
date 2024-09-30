@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LocationRepository {
 
     private final ConcurrentHashMap<Integer, Location> locations = new ConcurrentHashMap<>();
-    private int currentId = 0;
+    private Integer currentId = 0;
 
     public Collection<Location> findAll() {
         return locations.values();
