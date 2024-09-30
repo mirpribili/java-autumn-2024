@@ -1,5 +1,6 @@
 package ru.tbank.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -17,11 +18,9 @@ import ru.tbank.repository.CategoryRepository;
 import ru.tbank.repository.LocationRepository; // Импортируем репозиторий городов
 
 import java.util.Arrays;
-
+@Slf4j
 @Service
 public class DataInitializer implements ApplicationRunner {
-    @Logging
-    private Logger logger;
 
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository; // Добавляем репозиторий городов
@@ -34,7 +33,7 @@ public class DataInitializer implements ApplicationRunner {
     }
 
     public void init() {
-        logger.info("Загрузка данных из API kudago начата.");
+        log.info("Загрузка данных из API kudago начата.");
 
         try {
             // Загрузка категорий
@@ -43,12 +42,12 @@ public class DataInitializer implements ApplicationRunner {
                 Category[] categories = restTemplate.getForObject(categoriesUrl, Category[].class);
                 if (categories != null) {
                     Arrays.stream(categories).forEach(categoryRepository::save);
-                    logger.info("Категории загружены и сохранены успешно.");
+                    log.info("Категории загружены и сохранены успешно.");
                 } else {
-                    logger.warn("Загруженные категории пусты.");
+                    log.warn("Загруженные категории пусты.");
                 }
             } catch (RestClientException e) {
-                logger.error("Ошибка при загрузке категорий: {}", e.getMessage());
+                log.error("Ошибка при загрузке категорий: {}", e.getMessage());
             }
 
             // Загрузка городов
@@ -57,19 +56,19 @@ public class DataInitializer implements ApplicationRunner {
                 Location[] locations = restTemplate.getForObject(locationsUrl, Location[].class);
                 if (locations != null) {
                     Arrays.stream(locations).forEach(locationRepository::save);
-                    logger.info("Города загружены и сохранены успешно.");
+                    log.info("Города загружены и сохранены успешно.");
                 } else {
-                    logger.warn("Загруженные города пусты.");
+                    log.warn("Загруженные города пусты.");
                 }
             } catch (RestClientException e) {
-                logger.error("Ошибка при загрузке городов: {}", e.getMessage());
+                log.error("Ошибка при загрузке городов: {}", e.getMessage());
             }
 
         } catch (Exception e) {
-            logger.error("Ошибка при загрузке данных: {}", e.getMessage());
+            log.error("Ошибка при загрузке данных: {}", e.getMessage());
         }
 
-        logger.info("Загрузка данных завершена.");
+        log.info("Загрузка данных завершена.");
     }
 
     @LogMainExecution
