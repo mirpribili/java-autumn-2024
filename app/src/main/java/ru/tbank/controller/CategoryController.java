@@ -1,14 +1,11 @@
 package ru.tbank.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.model.Category;
 import ru.tbank.repository.CategoryRepository;
-import ru.tbank.service.DataInitializer;
 
 import java.util.Collection;
 
@@ -21,7 +18,6 @@ public class CategoryController {
     public CategoryController(CategoryRepository repository) {
         this.repository = repository;
     }
-    @LogControllerExecution
     @GetMapping
     public Collection<Category> getAllCategories() {
         return repository.findAll();

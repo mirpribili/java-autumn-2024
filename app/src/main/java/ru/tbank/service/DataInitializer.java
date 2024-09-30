@@ -1,17 +1,12 @@
 package ru.tbank.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import ru.tbank.annotation.LogControllerExecution;
 import ru.tbank.annotation.LogMainExecution;
-import ru.tbank.annotation.Logging;
 import ru.tbank.model.Category;
 import ru.tbank.model.Location; // Импортируем Location
 import ru.tbank.repository.CategoryRepository;
