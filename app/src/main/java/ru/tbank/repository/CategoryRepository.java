@@ -52,4 +52,9 @@ public class CategoryRepository {
     public boolean existsById(int id) {
         return categories.containsKey(id);
     }
+
+    public void clear() {
+        categories.clear();
+        currentId = 0; // Optionally reset ID counter
+    }
 }

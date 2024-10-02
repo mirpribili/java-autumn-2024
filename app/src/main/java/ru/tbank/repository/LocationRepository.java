@@ -45,6 +45,11 @@ public class LocationRepository {
         locations.remove(id);
     }
 
+    public void clear() {
+        locations.clear();
+        currentId = 0; // Optionally reset ID counter
+    }
+
     public boolean existsById(int id) {
         return locations.containsKey(id);
     }
