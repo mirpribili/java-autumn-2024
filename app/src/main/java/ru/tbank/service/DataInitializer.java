@@ -21,10 +21,10 @@ public class DataInitializer implements ApplicationRunner {
     private final LocationRepository locationRepository; // Добавляем репозиторий городов
     private final RestTemplate restTemplate;
 
-    public DataInitializer(CategoryRepository categoryRepository, LocationRepository locationRepository) {
+    public DataInitializer(CategoryRepository categoryRepository, LocationRepository locationRepository, RestTemplate restTemplate) {
         this.categoryRepository = categoryRepository;
         this.locationRepository = locationRepository; // Инициализируем репозиторий городов
-        this.restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate;
     }
 
     public void init() {
