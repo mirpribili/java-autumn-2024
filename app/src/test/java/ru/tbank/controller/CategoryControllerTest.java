@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.tbank.dto.CategoryDTO;
+import ru.tbank.exception.CategoryNotFoundException;
 import ru.tbank.mapper.CategoryMapper;
 import ru.tbank.model.Category;
 import ru.tbank.service.CategoryService;
@@ -102,5 +103,45 @@ class CategoryControllerTest {
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(categoryService, times(1)).deleteCategory(1);
+    }
+
+//------------------------------------------------------------------
+//                        NEGATIVE
+//------------------------------------------------------------------
+
+    @Test
+    void getCategoryById_NotFound() {
+        // Arrange
+        when(categoryService.getCategoryById(anyInt())).thenThrow(new CategoryNotFoundException(999));
+
+        // Act
+        ResponseEntity<CategoryDTO> response = categoryController.getCategoryById(999);
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void updateCategory_NotFound() {
+        // Arrange
+        when(categoryService.updateCategory(anyInt(), any(Category.class))).thenThrow(new CategoryNotFoundException(999));
+
+        // Act
+        ResponseEntity<CategoryDTO> response = categoryController.updateCategory(999, new CategoryDTO("cat1-updated", "Updated Category"));
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void deleteCategory_NotFound() {
+        // Arrange
+        doThrow(new CategoryNotFoundException(999)).when(categoryService).deleteCategory(anyInt());
+
+        // Act
+        ResponseEntity<Void> response = categoryController.deleteCategory(999);
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
