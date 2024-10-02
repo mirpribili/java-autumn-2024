@@ -1,6 +1,7 @@
 package ru.tbank.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
@@ -8,9 +9,9 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import ru.tbank.annotation.LogMainExecution;
 import ru.tbank.model.Category;
-import ru.tbank.model.Location; // Импортируем Location
+import ru.tbank.model.Location;
 import ru.tbank.repository.CategoryRepository;
-import ru.tbank.repository.LocationRepository; // Импортируем репозиторий городов
+import ru.tbank.repository.LocationRepository;
 
 import java.util.Arrays;
 @Slf4j
@@ -20,6 +21,9 @@ public class DataInitializer implements ApplicationRunner {
     private final CategoryRepository categoryRepository;
     private final LocationRepository locationRepository; // Добавляем репозиторий городов
     private final RestTemplate restTemplate;
+
+    @Value("${rest.kudago-service.host}")
+    private String baseUrl;
 
     public DataInitializer(CategoryRepository categoryRepository, LocationRepository locationRepository, RestTemplate restTemplate) {
         this.categoryRepository = categoryRepository;
@@ -32,7 +36,7 @@ public class DataInitializer implements ApplicationRunner {
 
         try {
             // Загрузка категорий
-            String categoriesUrl = "https://kudago.com/public-api/v1.4/place-categories";
+            String categoriesUrl = baseUrl + "/place-categories";
             try {
                 Category[] categories = restTemplate.getForObject(categoriesUrl, Category[].class);
                 if (categories != null) {
@@ -46,7 +50,7 @@ public class DataInitializer implements ApplicationRunner {
             }
 
             // Загрузка городов
-            String locationsUrl = "https://kudago.com/public-api/v1.4/locations";
+            String locationsUrl = baseUrl + "/locations";
             try {
                 Location[] locations = restTemplate.getForObject(locationsUrl, Location[].class);
                 if (locations != null) {

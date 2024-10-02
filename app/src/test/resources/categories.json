@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/place-categories"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": [
+      { "id": 123, "slug": "airports", "name": "Airports" },
+      { "id": 89, "slug": "amusement", "name": "Amusement parks (Entertainment)" }
+    ]
+  }
+}
