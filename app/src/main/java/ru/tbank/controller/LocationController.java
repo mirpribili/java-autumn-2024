@@ -8,6 +8,7 @@ import ru.tbank.dto.LocationDTO;
 import ru.tbank.model.Location;
 import ru.tbank.service.LocationService;
 import ru.tbank.mapper.LocationMapper;
+import ru.tbank.exception.LocationNotFoundException;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -31,8 +32,12 @@ public class LocationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<LocationDTO> getLocationById(@PathVariable int id) {
-        Location location = locationService.getLocationById(id);
-        return ResponseEntity.ok(LocationMapper.toDTO(location));
+        try {
+            Location location = locationService.getLocationById(id);
+            return ResponseEntity.ok(LocationMapper.toDTO(location));
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
@@ -43,13 +48,21 @@ public class LocationController {
 
     @PutMapping("/{id}")
     public ResponseEntity<LocationDTO> updateLocation(@PathVariable int id, @RequestBody LocationDTO locationDTO) {
-        Location updatedLocation = locationService.updateLocation(id, LocationMapper.toEntity(locationDTO));
-        return ResponseEntity.ok(LocationMapper.toDTO(updatedLocation));
+        try {
+            Location updatedLocation = locationService.updateLocation(id, LocationMapper.toEntity(locationDTO));
+            return ResponseEntity.ok(LocationMapper.toDTO(updatedLocation));
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable int id) {
-        locationService.deleteLocation(id);
-        return ResponseEntity.noContent().build();
+        try {
+            locationService.deleteLocation(id);
+            return ResponseEntity.noContent().build();
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

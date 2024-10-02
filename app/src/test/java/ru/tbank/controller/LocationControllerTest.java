@@ -8,6 +8,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import ru.tbank.dto.LocationDTO;
+import ru.tbank.exception.LocationNotFoundException;
 import ru.tbank.mapper.LocationMapper;
 import ru.tbank.model.Location;
 import ru.tbank.service.LocationService;
@@ -64,6 +65,18 @@ class LocationControllerTest {
     }
 
     @Test
+    void getLocationById_NotFound() {
+        // Arrange
+        when(locationService.getLocationById(anyInt())).thenThrow(new LocationNotFoundException(999));
+
+        // Act
+        ResponseEntity<LocationDTO> response = locationController.getLocationById(999);
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void createLocation() {
         // Arrange
         LocationDTO newLocationDTO = new LocationDTO("loc3", "Location 3");
@@ -95,6 +108,18 @@ class LocationControllerTest {
     }
 
     @Test
+    void updateLocation_NotFound() {
+        // Arrange
+        when(locationService.updateLocation(anyInt(), any(Location.class))).thenThrow(new LocationNotFoundException(999));
+
+        // Act
+        ResponseEntity<LocationDTO> response = locationController.updateLocation(999, new LocationDTO("loc1-updated", "Updated Location"));
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void deleteLocation() {
         // Act
         ResponseEntity<Void> response = locationController.deleteLocation(1);
@@ -102,5 +127,17 @@ class LocationControllerTest {
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(locationService, times(1)).deleteLocation(1);
+    }
+
+    @Test
+    void deleteLocation_NotFound() {
+        // Arrange
+        doThrow(new LocationNotFoundException(999)).when(locationService).deleteLocation(anyInt());
+
+        // Act
+        ResponseEntity<Void> response = locationController.deleteLocation(999);
+
+        // Assert that the response status is NOT_FOUND (404)
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 }
