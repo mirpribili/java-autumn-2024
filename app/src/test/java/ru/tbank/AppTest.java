@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import static org.junit.Assert.*;
 
 public class AppTest {
-    @Test public void appHasAGreeting() {
+    @Test public void appHasAMain() {
         Method mainMethod = null;
         try {
             mainMethod = Class.forName("ru.tbank.App").getDeclaredMethod("main", String[].class);

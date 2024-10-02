@@ -2,42 +2,103 @@ package ru.tbank.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import ru.tbank.model.Category;
-import ru.tbank.repository.CategoryRepository;
+import ru.tbank.service.CategoryService;
 
 import java.util.Arrays;
+import java.util.Collection;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.Mockito.*;
 
-@WebMvcTest(CategoryController.class)
-public class CategoryControllerTest {
+class CategoryControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    @InjectMocks
+    private CategoryController categoryController;
 
-    @Autowired
-    private CategoryRepository categoryRepository; // Мокируем репозиторий
+    @Mock
+    private CategoryService categoryService;
 
     @BeforeEach
-    public void setUp() {
-        when(categoryRepository.findAll()).thenReturn(Arrays.asList(
-                new Category(1, "cat1", "Category 1"),
-                new Category(2, "cat2", "Category 2")
-        ));
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testGetAllCategories() throws Exception {
-        mockMvc.perform(get("/api/v1/places/categories")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+    void getAllCategories() {
+        // Arrange
+        Category category1 = new Category(1, "cat1", "Category 1");
+        Category category2 = new Category(2, "cat2", "Category 2");
+        when(categoryService.getAllCategories()).thenReturn(Arrays.asList(category1, category2));
+
+        // Act
+        Collection<Category> categories = categoryController.getAllCategories();
+
+        // Assert
+        assertEquals(2, categories.size());
+        verify(categoryService, times(1)).getAllCategories(); // Убедитесь, что метод сервиса был вызван один раз
+    }
+
+    @Test
+    void getCategoryById() {
+        // Arrange
+        Category category = new Category(1, "cat1", "Category 1");
+        when(categoryService.getCategoryById(anyInt())).thenReturn(category);
+
+        // Act
+        ResponseEntity<Category> response = categoryController.getCategoryById(1);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(category, response.getBody());
+        verify(categoryService, times(1)).getCategoryById(1); // Убедитесь, что метод сервиса был вызван один раз
+    }
+
+    @Test
+    void createCategory() {
+        // Arrange
+        Category newCategory = new Category(0, "cat3", "Category 3");
+        Category createdCategory = new Category(3, "cat3", "Category 3");
+        when(categoryService.createCategory(any(Category.class))).thenReturn(createdCategory);
+
+        // Act
+        ResponseEntity<Category> response = categoryController.createCategory(newCategory);
+
+        // Assert
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(createdCategory, response.getBody());
+        verify(categoryService, times(1)).createCategory(newCategory); // Убедитесь, что метод сервиса был вызван один раз
+    }
+
+    @Test
+    void updateCategory() {
+        // Arrange
+        Category updatedCategory = new Category(1, "cat1-updated", "Updated Category");
+        when(categoryService.updateCategory(anyInt(), any(Category.class))).thenReturn(updatedCategory);
+
+        // Act
+        ResponseEntity<Category> response = categoryController.updateCategory(1, updatedCategory);
+
+        // Assert
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(updatedCategory, response.getBody());
+        verify(categoryService, times(1)).updateCategory(1, updatedCategory); // Убедитесь, что метод сервиса был вызван один раз
+    }
+
+    @Test
+    void deleteCategory() {
+        // Act
+        ResponseEntity<Void> response = categoryController.deleteCategory(1);
+
+        // Assert
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(categoryService, times(1)).deleteCategory(1); // Убедитесь, что метод сервиса был вызван один раз
     }
 }
