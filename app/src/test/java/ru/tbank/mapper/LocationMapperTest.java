@@ -7,7 +7,6 @@ import ru.tbank.model.Location;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class LocationMapperTest {
-// TODO добить до 100% для этого класса, думал тут 100 будет легче всего увидеть
     @Test
     void testToDTO() {
         // Arrange
