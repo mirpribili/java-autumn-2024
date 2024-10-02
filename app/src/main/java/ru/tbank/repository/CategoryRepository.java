@@ -34,8 +34,11 @@ public class CategoryRepository {
             log.warn("Попытка обновления несуществующей категории с ID: {}", id);
             throw new CategoryNotFoundException(id);
         }
+        // Устанавливаем ID для обновленной категории
         category.setId(id);
-        return categories.replace(id, category);
+        // Сохраняем категорию обратно в мапу
+        categories.put(id, category); // put to replace
+        return category; // Возвращаем обновленную категорию
     }
 
     public void delete(int id) {
