@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import ru.tbank.dto.CategoryDTO;
+import ru.tbank.mapper.CategoryMapper;
 import ru.tbank.model.Category;
 import ru.tbank.service.CategoryService;
 
@@ -39,11 +41,11 @@ class CategoryControllerTest {
         when(categoryService.getAllCategories()).thenReturn(Arrays.asList(category1, category2));
 
         // Act
-        Collection<Category> categories = categoryController.getAllCategories();
+        Collection<CategoryDTO> categories = categoryController.getAllCategories();
 
         // Assert
         assertEquals(2, categories.size());
-        verify(categoryService, times(1)).getAllCategories(); // Убедитесь, что метод сервиса был вызван один раз
+        verify(categoryService, times(1)).getAllCategories();
     }
 
     @Test
@@ -53,28 +55,28 @@ class CategoryControllerTest {
         when(categoryService.getCategoryById(anyInt())).thenReturn(category);
 
         // Act
-        ResponseEntity<Category> response = categoryController.getCategoryById(1);
+        ResponseEntity<CategoryDTO> response = categoryController.getCategoryById(1);
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(category, response.getBody());
-        verify(categoryService, times(1)).getCategoryById(1); // Убедитесь, что метод сервиса был вызван один раз
+        assertEquals(CategoryMapper.toDTO(category), response.getBody());
+        verify(categoryService, times(1)).getCategoryById(1);
     }
 
     @Test
     void createCategory() {
         // Arrange
-        Category newCategory = new Category(0, "cat3", "Category 3");
+        CategoryDTO newCategoryDTO = new CategoryDTO("cat3", "Category 3");
         Category createdCategory = new Category(3, "cat3", "Category 3");
         when(categoryService.createCategory(any(Category.class))).thenReturn(createdCategory);
 
         // Act
-        ResponseEntity<Category> response = categoryController.createCategory(newCategory);
+        ResponseEntity<CategoryDTO> response = categoryController.createCategory(newCategoryDTO);
 
         // Assert
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(createdCategory, response.getBody());
-        verify(categoryService, times(1)).createCategory(newCategory); // Убедитесь, что метод сервиса был вызван один раз
+        assertEquals(CategoryMapper.toDTO(createdCategory), response.getBody());
+        verify(categoryService, times(1)).createCategory(any(Category.class));
     }
 
     @Test
@@ -84,12 +86,12 @@ class CategoryControllerTest {
         when(categoryService.updateCategory(anyInt(), any(Category.class))).thenReturn(updatedCategory);
 
         // Act
-        ResponseEntity<Category> response = categoryController.updateCategory(1, updatedCategory);
+        ResponseEntity<CategoryDTO> response = categoryController.updateCategory(1, new CategoryDTO("cat1-updated", "Updated Category"));
 
         // Assert
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(updatedCategory, response.getBody());
-        verify(categoryService, times(1)).updateCategory(1, updatedCategory); // Убедитесь, что метод сервиса был вызван один раз
+        assertEquals(CategoryMapper.toDTO(updatedCategory), response.getBody());
+        verify(categoryService, times(1)).updateCategory(eq(1), any(Category.class));
     }
 
     @Test
@@ -99,6 +101,6 @@ class CategoryControllerTest {
 
         // Assert
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(categoryService, times(1)).deleteCategory(1); // Убедитесь, что метод сервиса был вызван один раз
+        verify(categoryService, times(1)).deleteCategory(1);
     }
 }
