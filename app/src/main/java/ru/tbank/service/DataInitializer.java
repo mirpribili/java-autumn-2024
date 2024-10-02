@@ -1,5 +1,6 @@
 package ru.tbank.service;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -22,6 +23,7 @@ public class DataInitializer implements ApplicationRunner {
     private final LocationRepository locationRepository; // Добавляем репозиторий городов
     private final RestTemplate restTemplate;
 
+    @Setter
     @Value("${rest.kudago-service.host}")
     private String baseUrl;
 
