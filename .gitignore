@@ -28,3 +28,5 @@ out/
 gradle-app.setting
 gradle-wrapper.jar
 gradle-wrapper.properties
+/app/src/main/*.sh
+/app/src/main/*.txt
