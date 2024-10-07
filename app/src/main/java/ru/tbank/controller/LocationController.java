@@ -4,10 +4,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.tbank.annotation.LogControllerExecution;
+import ru.tbank.dto.LocationDTO;
 import ru.tbank.model.Location;
 import ru.tbank.service.LocationService;
+import ru.tbank.mapper.LocationMapper;
+import ru.tbank.exception.LocationNotFoundException;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/locations")
@@ -20,31 +24,45 @@ public class LocationController {
     }
 
     @GetMapping
-    public Collection<Location> getAllLocations() {
-        return locationService.getAllLocations();
+    public Collection<LocationDTO> getAllLocations() {
+        return locationService.getAllLocations().stream()
+                .map(LocationMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Location> getLocationById(@PathVariable int id) {
-        Location location = locationService.getLocationById(id);
-        return ResponseEntity.ok(location);
+    public ResponseEntity<LocationDTO> getLocationById(@PathVariable int id) {
+        try {
+            Location location = locationService.getLocationById(id);
+            return ResponseEntity.ok(LocationMapper.toDTO(location));
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<Location> createLocation(@RequestBody Location location) {
-        Location createdLocation = locationService.createLocation(location);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdLocation);
+    public ResponseEntity<LocationDTO> createLocation(@RequestBody LocationDTO locationDTO) {
+        Location createdLocation = locationService.createLocation(LocationMapper.toEntity(locationDTO));
+        return ResponseEntity.status(HttpStatus.CREATED).body(LocationMapper.toDTO(createdLocation));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Location> updateLocation(@PathVariable int id, @RequestBody Location location) {
-        Location updatedLocation = locationService.updateLocation(id, location);
-        return ResponseEntity.ok(updatedLocation);
+    public ResponseEntity<LocationDTO> updateLocation(@PathVariable int id, @RequestBody LocationDTO locationDTO) {
+        try {
+            Location updatedLocation = locationService.updateLocation(id, LocationMapper.toEntity(locationDTO));
+            return ResponseEntity.ok(LocationMapper.toDTO(updatedLocation));
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteLocation(@PathVariable int id) {
-        locationService.deleteLocation(id);
-        return ResponseEntity.noContent().build();
+        try {
+            locationService.deleteLocation(id);
+            return ResponseEntity.noContent().build();
+        } catch (LocationNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }

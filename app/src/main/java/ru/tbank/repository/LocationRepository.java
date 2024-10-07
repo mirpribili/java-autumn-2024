@@ -1,6 +1,8 @@
 package ru.tbank.repository;
 
 import org.springframework.stereotype.Repository;
+import ru.tbank.exception.CategoryNotFoundException;
+import ru.tbank.exception.LocationNotFoundException;
 import ru.tbank.model.Location;
 
 import java.util.Collection;
@@ -28,12 +30,24 @@ public class LocationRepository {
     }
 
     public Location update(int id, Location location) {
+        if (!locations.containsKey(id)) {
+            throw new LocationNotFoundException(id);
+        }
         location.setId(id);
-        return locations.replace(id, location);
+        locations.put(id, location);
+        return location; // Возвращаем обновленную локацию
     }
 
     public void delete(int id) {
+        if (!locations.containsKey(id)) {
+            throw new LocationNotFoundException(id);
+        }
         locations.remove(id);
+    }
+
+    public void clear() {
+        locations.clear();
+        currentId = 0; // Optionally reset ID counter
     }
 
     public boolean existsById(int id) {

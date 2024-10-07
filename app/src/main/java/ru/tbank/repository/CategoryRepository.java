@@ -1,12 +1,14 @@
 package ru.tbank.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Repository;
 import ru.tbank.exception.CategoryNotFoundException;
 import ru.tbank.model.Category;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.stereotype.Repository;
+
 @Slf4j
 @Repository
 public class CategoryRepository {
@@ -17,8 +19,8 @@ public class CategoryRepository {
         return categories.values();
     }
 
-    public Category findById(int id) {
-        return categories.get(id);
+    public Optional<Category> findById(int id) {
+        return Optional.ofNullable(categories.get(id));
     }
 
     public Category save(Category category) {
@@ -30,21 +32,29 @@ public class CategoryRepository {
     public Category update(int id, Category category) {
         if (!categories.containsKey(id)) {
             log.warn("Попытка обновления несуществующей категории с ID: {}", id);
-            throw new CategoryNotFoundException(id); // Выбрасываем исключение
+            throw new CategoryNotFoundException(id);
         }
+        // Устанавливаем ID для обновленной категории
         category.setId(id);
-        return categories.replace(id, category);
+        // Сохраняем категорию обратно в мапу
+        categories.put(id, category); // put to replace
+        return category; // Возвращаем обновленную категорию
     }
 
     public void delete(int id) {
         if (!categories.containsKey(id)) {
             log.warn("Попытка удаления несуществующей категории с ID: {}", id);
-            throw new CategoryNotFoundException(id); // Выбрасываем исключение
+            throw new CategoryNotFoundException(id);
         }
         categories.remove(id);
     }
 
     public boolean existsById(int id) {
         return categories.containsKey(id);
+    }
+
+    public void clear() {
+        categories.clear();
+        currentId = 0; // Optionally reset ID counter
     }
 }
