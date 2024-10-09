@@ -14,3 +14,6 @@ rootProject.name = 'java-autumn-2024'
 include('app')
 rootProject.name = 'app'
 include('logging-starter')
+include('currencies_converter')
+rootProject.name = 'currencies_converter'
+
