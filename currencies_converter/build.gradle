@@ -31,9 +31,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.0'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+	implementation 'io.github.resilience4j:resilience4j-circuitbreaker:2.2.0'
+	implementation 'io.github.resilience4j:resilience4j-core:2.2.0'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.mockito:mockito-core:5.0.0'
 }
 
 tasks.named('test') {

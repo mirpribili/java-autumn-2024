@@ -14,3 +14,14 @@ feign:
     cache-names: currencyRates
     simple:
       ttl: 3600
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      currencyService:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        waitDurationInOpenState: 10000ms
+        failureRateThreshold: 50
+        permittedNumberOfCallsInHalfOpenState: 3
