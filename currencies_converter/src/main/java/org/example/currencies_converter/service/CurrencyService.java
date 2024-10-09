@@ -6,6 +6,7 @@ import org.example.currencies_converter.client.FeignClientCurrencyParser;
 import org.example.currencies_converter.dto.CurrencyData;
 import org.example.currencies_converter.dto.CurrencyRateResponse;
 import org.example.currencies_converter.exception.CurrencyNotFoundException;
+import org.example.currencies_converter.exception.CurrencyServiceUnavailableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -38,40 +43,88 @@ public class CurrencyService {
         this.feignClient = feignClient;
     }
 
+
+
     @Cacheable("currencyRates")
     @CircuitBreaker(name = "currencyService", fallbackMethod = "fallbackFetchCurrencyRates")
-    public Set<CurrencyData> fetchCurrencyRates() throws ParserConfigurationException, IOException, SAXException {
-        Set<CurrencyData> currencySet = new HashSet<>();
-        try {
-            String currentDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-            String xmlResponse = feignClient.getCurrencyRates(currentDate);
+    public Set<CurrencyData> fetchCurrencyRates() {
+        String currentDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+        int maxAttempts = 5; // Максимальное количество попыток
+        int attempt = 0;
 
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+        while (attempt < maxAttempts) {
+            CompletableFuture<Set<CurrencyData>> future = CompletableFuture.supplyAsync(() -> {
+                return getCurrencyData(currentDate);
+            });
 
-            NodeList valuteList = document.getElementsByTagName("Valute");
-
-            for (int i = 0; i < valuteList.getLength(); i++) {
-                Element valute = (Element) valuteList.item(i);
-                String numCode = valute.getElementsByTagName("NumCode").item(0).getTextContent();
-                String charCode = valute.getElementsByTagName("CharCode").item(0).getTextContent();
-                int nominal = Integer.parseInt(valute.getElementsByTagName("Nominal").item(0).getTextContent());
-                String name = valute.getElementsByTagName("Name").item(0).getTextContent();
-                BigDecimal value = new BigDecimal(valute.getElementsByTagName("Value").item(0).getTextContent().replace(",", "."));
-                BigDecimal vunitRate = new BigDecimal(valute.getElementsByTagName("VunitRate").item(0).getTextContent().replace(",", "."));
-
-                CurrencyData currencyData = new CurrencyData(numCode, charCode, nominal, name, value, vunitRate);
-                currencySet.add(currencyData);
-
-                log.info("Валюта: {} ({}): {} рублей", name, charCode, value);
+            try {
+                // Ожидаем завершения с таймаутом
+                return future.orTimeout(5, TimeUnit.SECONDS).join(); // Таймаут 5 секунд
+            } catch (CompletionException e) {
+                // Проверяем, является ли причиной таймаут
+                if (e.getCause() instanceof TimeoutException) {
+                    log.warn("Timeout occurred on attempt {}: {}", attempt + 1, e.getMessage());
+                } else {
+                    log.error("Error fetching currency rates on attempt {}: {}", attempt + 1, e.getMessage());
+                }
+                attempt++;
             }
-            // Добавляем RUB с курсом 1 к 1
-            currencySet.add(new CurrencyData("643", "RUB", 1, "Российский рубль", BigDecimal.ONE, BigDecimal.ONE));
-        } catch (Exception e) {
-            log.error("Error fetching currency rates", e);
-            throw e; // Важно выбросить исключение для регистрации в Circuit Breaker
+
+            // Задержка между попытками
+            try {
+                Thread.sleep(1000); // Задержка в 1 секунду перед следующей попыткой
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt(); // Восстанавливаем статус прерывания
+                throw new RuntimeException("Thread was interrupted", ie);
+            }
         }
+
+        throw new CurrencyServiceUnavailableException("Currency service is currently unavailable after " + maxAttempts + " attempts");
+    }
+
+    private Set<CurrencyData> getCurrencyData(String currentDate) {
+        Set<CurrencyData> currencySet = new HashSet<>();
+
+        // Выполняем внешний запрос
+        String xmlResponse = feignClient.getCurrencyRates(currentDate);
+        log.info("XML Response: {}", xmlResponse);
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = null;
+        try {
+            builder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        Document document = null;
+        try {
+            document = builder.parse(new InputSource(new StringReader(xmlResponse)));
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        NodeList valuteList = document.getElementsByTagName("Valute");
+
+        for (int i = 0; i < valuteList.getLength(); i++) {
+            Element valute = (Element) valuteList.item(i);
+            String numCode = valute.getElementsByTagName("NumCode").item(0).getTextContent();
+            String charCode = valute.getElementsByTagName("CharCode").item(0).getTextContent();
+            int nominal = Integer.parseInt(valute.getElementsByTagName("Nominal").item(0).getTextContent());
+            String name = valute.getElementsByTagName("Name").item(0).getTextContent();
+            BigDecimal value = new BigDecimal(valute.getElementsByTagName("Value").item(0).getTextContent().replace(",", "."));
+            BigDecimal vunitRate = new BigDecimal(valute.getElementsByTagName("VunitRate").item(0).getTextContent().replace(",", "."));
+
+            CurrencyData currencyData = new CurrencyData(numCode, charCode, nominal, name, value, vunitRate);
+            currencySet.add(currencyData);
+
+            log.info("Валюта: {} ({}): {} рублей", name, charCode, value);
+        }
+
+        // Добавляем RUB с курсом 1 к 1
+        currencySet.add(new CurrencyData("643", "RUB", 1, "Российский рубль", BigDecimal.ONE, BigDecimal.ONE));
+
         return currencySet;
     }
 
@@ -90,12 +143,6 @@ public class CurrencyService {
 
             // Возвращаем новый объект CurrencyRateResponse с нужными данными
             return new CurrencyRateResponse(currencyData.getCharCode(), currencyData.getValue().doubleValue());
-        } catch (IOException e) {
-            log.error("Ошибка ввода-вывода: {}", e.getMessage());
-            throw new RuntimeException("Ошибка ввода-вывода", e);
-        } catch (SAXException e) {
-            log.error("Ошибка парсинга XML: {}", e.getMessage());
-            throw new RuntimeException("Ошибка парсинга XML", e);
         } catch (Exception e) {
             log.error("Неизвестная ошибка: {}", e.getMessage());
             throw new RuntimeException("Неизвестная ошибка", e);
@@ -108,11 +155,7 @@ public class CurrencyService {
 
         // Получаем все валютные данные
         Set<CurrencyData> currencyRates = null;
-        try {
-            currencyRates = fetchCurrencyRates();
-        } catch (ParserConfigurationException | IOException | SAXException e) {
-            throw new RuntimeException(e);
-        }
+        currencyRates = fetchCurrencyRates();
 
         // Находим данные для исходной и целевой валюты
         CurrencyData fromRate = currencyRates.stream()

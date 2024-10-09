@@ -15,6 +15,5 @@ public class CurrencyConversionRequest {
     private String toCurrency;
 
     @Positive(message = "Amount must be greater than zero")
-    @NotBlank(message = "To amount must not be blank")
     private Double amount;
 }

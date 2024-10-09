@@ -15,3 +15,5 @@ include('app')
 rootProject.name = 'app'
 include('logging-starter')
 include('currencies_converter')
+rootProject.name = 'currencies_converter'
+
