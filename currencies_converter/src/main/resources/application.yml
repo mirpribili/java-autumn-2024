@@ -1,0 +1,11 @@
+
+spring:
+  application:
+    name: currencies_converter
+
+feign:
+  client:
+    config:
+      currencyClient:
+        url: http://www.cbr.ru
+        endpoint: /scripts/XML_daily.asp #?date_req=07/10/2024

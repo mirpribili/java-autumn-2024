@@ -30,3 +30,5 @@ gradle-wrapper.jar
 gradle-wrapper.properties
 /app/src/main/*.sh
 /app/src/main/*.txt
+/currencies_converter/*.txt
+/currencies_converter/*.sh
