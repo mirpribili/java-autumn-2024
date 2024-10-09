@@ -10,11 +10,6 @@ feign:
         url: http://www.cbr.ru
         endpoint: /scripts/XML_daily.asp #?date_req=07/10/2024
 
-  cache:
-    cache-names: currencyRates
-    simple:
-      ttl: 3600
-
 resilience4j:
   circuitbreaker:
     instances:
@@ -25,3 +20,4 @@ resilience4j:
         waitDurationInOpenState: 10000ms
         failureRateThreshold: 50
         permittedNumberOfCallsInHalfOpenState: 3
+# http://localhost:8080/swagger-ui/index.html

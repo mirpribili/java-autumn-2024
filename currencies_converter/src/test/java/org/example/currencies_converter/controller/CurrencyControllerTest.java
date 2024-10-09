@@ -37,6 +37,8 @@ public class CurrencyControllerTest {
 
     @Test
     public void testConvertCurrency() throws Exception {
+        // curl -X POST http://localhost:8080/currencies/convert -H "Content-Type: application/json" -d '{"fromCurrency": "USD", "toCurrency": "RUB", "amount": 100.5}'
+
         // Подготовка данных для теста
         CurrencyConversionRequest request = new CurrencyConversionRequest("USD", "RUB", 100.5);
         ConversionResponse response = new ConversionResponse("USD", "RUB", 9000.5);

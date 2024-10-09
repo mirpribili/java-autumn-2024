@@ -66,6 +66,8 @@ public class CurrencyService {
 
                 log.info("Валюта: {} ({}): {} рублей", name, charCode, value);
             }
+            // Добавляем RUB с курсом 1 к 1
+            currencySet.add(new CurrencyData("643", "RUB", 1, "Российский рубль", BigDecimal.ONE, BigDecimal.ONE));
         } catch (Exception e) {
             log.error("Error fetching currency rates", e);
             throw e; // Важно выбросить исключение для регистрации в Circuit Breaker
@@ -101,19 +103,14 @@ public class CurrencyService {
     }
 
     public double convertCurrency(String fromCurrency, String toCurrency, double amount) throws CurrencyNotFoundException {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than zero");
-        }
+        // Проверка параметров
+        validateCurrencyConversionRequest(fromCurrency, toCurrency, amount);
 
         // Получаем все валютные данные
         Set<CurrencyData> currencyRates = null;
         try {
             currencyRates = fetchCurrencyRates();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
+        } catch (ParserConfigurationException | IOException | SAXException e) {
             throw new RuntimeException(e);
         }
 
@@ -128,11 +125,27 @@ public class CurrencyService {
                 .findFirst()
                 .orElseThrow(() -> new CurrencyNotFoundException("Unsupported currency code: " + toCurrency));
 
-        // Конвертация: (amount / fromRate.value) * toRate.value
-        return (amount / fromRate.getValue().doubleValue()) * toRate.getValue().doubleValue();
+        // Конвертация
+        if (fromCurrency.equals("RUB")) {
+            return amount / toRate.getValue().doubleValue();
+        } else {
+            return amount * fromRate.getValue().doubleValue();
+        }
     }
 
     public void simulateFailure() {
         throw new RuntimeException("Simulated failure for testing");
+    }
+
+    public void validateCurrencyConversionRequest(String fromCurrency, String toCurrency, Double amount) {
+        if (fromCurrency == null || fromCurrency.isEmpty()) {
+            throw new IllegalArgumentException("From currency must not be null or empty");
+        }
+        if (toCurrency == null || toCurrency.isEmpty()) {
+            throw new IllegalArgumentException("To currency must not be null or empty");
+        }
+        if (amount == null || amount <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than zero");
+        }
     }
 }
