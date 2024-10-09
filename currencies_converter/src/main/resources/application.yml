@@ -9,3 +9,8 @@ feign:
       currencyClient:
         url: http://www.cbr.ru
         endpoint: /scripts/XML_daily.asp #?date_req=07/10/2024
+
+  cache:
+    cache-names: currencyRates
+    simple:
+      ttl: 3600

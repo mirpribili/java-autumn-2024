@@ -34,7 +34,6 @@ public class CurrencyService {
     public Set<CurrencyData> fetchCurrencyRates() {
         Set<CurrencyData> currencySet = new HashSet<>();
         try {
-            Map<String, String> currencyMap = new HashMap<>();
             // Получаем текущую дату в формате dd/MM/yyyy
             String currentDate = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
 
